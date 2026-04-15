@@ -1,6 +1,6 @@
 # TradingHub
 
-A Bloomberg terminal-inspired web application for US equity trading decisions. Real-time market data, charts, fundamentals, options, news, and economic indicators.
+A Bloomberg terminal inspired web application for US equity trading decisions. Real-time market data, charts, fundamentals, options, news, and economic indicators.
 
 ![Stack](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square) ![Stack](https://img.shields.io/badge/Frontend-Next.js_14-000000?style=flat-square) ![Stack](https://img.shields.io/badge/Charts-TradingView_Lightweight-2962FF?style=flat-square) ![Stack](https://img.shields.io/badge/Cache-Redis-DC382D?style=flat-square)
 
