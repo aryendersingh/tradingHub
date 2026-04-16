@@ -194,8 +194,8 @@ export default function StockScreener() {
                   </tr>
                 </thead>
                 <tbody>
-                  {results.map((stock) => (
-                    <tr key={stock.symbol} className="hover:bg-[var(--bg-hover)]">
+                  {results.map((stock, i) => (
+                    <tr key={`${stock.symbol}-${i}`} className="hover:bg-[var(--bg-hover)]">
                       <td>
                         <Link
                           href={`/stock/${stock.symbol}`}

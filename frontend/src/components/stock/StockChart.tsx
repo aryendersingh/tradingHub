@@ -89,8 +89,12 @@ export default function StockChart({ symbol }: { symbol: string }) {
   useEffect(() => {
     if (!data || !candleSeriesRef.current || !volumeSeriesRef.current) return;
 
+    const isIntraday = timeframe.interval.includes("m") || timeframe.interval.includes("h");
+    const formatTime = (t: string) =>
+      isIntraday ? Math.floor(new Date(t).getTime() / 1000) : t.slice(0, 10);
+
     const candles = (data as OHLCV[]).map((d) => ({
-      time: d.time as string,
+      time: formatTime(d.time) as string & number,
       open: d.open ?? 0,
       high: d.high ?? 0,
       low: d.low ?? 0,
@@ -98,7 +102,7 @@ export default function StockChart({ symbol }: { symbol: string }) {
     }));
 
     const volumes = (data as OHLCV[]).map((d) => ({
-      time: d.time as string,
+      time: formatTime(d.time) as string & number,
       value: d.volume ?? 0,
       color:
         (d.close ?? 0) >= (d.open ?? 0)
