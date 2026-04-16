@@ -3,6 +3,9 @@ import YieldCurve from "@/components/economic/YieldCurve";
 import EconomicCalendarView from "@/components/economic/EconomicCalendarView";
 import MacroIndicators from "@/components/economic/MacroIndicators";
 import ForexRates from "@/components/economic/ForexRates";
+import CommodityPrices from "@/components/economic/CommodityPrices";
+import IPOCalendar from "@/components/economic/IPOCalendar";
+import EarningsCalendar from "@/components/market/EarningsCalendar";
 
 export default function EconomicPage() {
   return (
@@ -15,6 +18,11 @@ export default function EconomicPage() {
         <YieldCurve />
         <ForexRates />
       </div>
+      <div className="grid grid-cols-2 gap-4">
+        <CommodityPrices />
+        <IPOCalendar />
+      </div>
+      <EarningsCalendar />
       <EconomicCalendarView />
     </div>
   );

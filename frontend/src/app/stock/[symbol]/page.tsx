@@ -9,6 +9,8 @@ import OptionsChain from "@/components/options/OptionsChain";
 import RatingsChart from "@/components/analyst/RatingsChart";
 import EarningsTable from "@/components/analyst/EarningsTable";
 import HoldersBreakdown from "@/components/stock/HoldersBreakdown";
+import ShortInterest from "@/components/stock/ShortInterest";
+import PeerComparison from "@/components/stock/PeerComparison";
 import NewsFeed from "@/components/news/NewsFeed";
 import { useStockNews, useFilings } from "@/hooks/useStockData";
 import type { NewsArticle } from "@/lib/types";
@@ -60,9 +62,13 @@ export default function StockDetailPage() {
             <div className="space-y-4">
               <RatingsChart symbol={symbol} />
               <EarningsTable symbol={symbol} />
+              <ShortInterest symbol={symbol} />
             </div>
             <div className="col-span-3">
               <FundamentalsTable symbol={symbol} />
+            </div>
+            <div className="col-span-3">
+              <PeerComparison symbol={symbol} />
             </div>
           </div>
         )}

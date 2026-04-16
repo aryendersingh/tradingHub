@@ -1,8 +1,15 @@
 from fastapi import APIRouter
 
 from app.services import stock_service
+from app.services import peer_service
 
 router = APIRouter()
+
+
+@router.get("/compare")
+async def get_comparison(symbols: str, period: str = "1y", interval: str = "1d"):
+    symbol_list = [s.strip().upper() for s in symbols.split(",")][:5]
+    return await stock_service.get_comparison(symbol_list, period, interval)
 
 
 @router.get("/{symbol}/quote")
@@ -33,3 +40,13 @@ async def get_ratios(symbol: str):
 @router.get("/{symbol}/dividends")
 async def get_dividends(symbol: str):
     return await stock_service.get_dividends(symbol.upper())
+
+
+@router.get("/{symbol}/peers")
+async def get_peers(symbol: str):
+    return await peer_service.get_peers(symbol.upper())
+
+
+@router.get("/{symbol}/short-interest")
+async def get_short_interest(symbol: str):
+    return await stock_service.get_short_interest(symbol.upper())

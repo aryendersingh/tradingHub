@@ -103,6 +103,17 @@ def _download_tickers(symbols: list[str], period: str = "1d", interval: str = "1
     return yf.download(symbols, period=period, interval=interval, group_by="ticker", threads=True)
 
 
+def _get_multi_ticker_info(symbols: list[str]) -> list[dict]:
+    results = []
+    for s in symbols:
+        try:
+            t = yf.Ticker(s)
+            results.append(dict(t.info))
+        except Exception:
+            results.append({})
+    return results
+
+
 # Async wrappers
 async def get_ticker_info(symbol: str) -> dict:
     return await _run_sync(_get_ticker_info, symbol)
@@ -166,3 +177,7 @@ async def get_dividends(symbol: str) -> pd.Series:
 
 async def download_tickers(symbols: list[str], period: str = "1d", interval: str = "1d") -> pd.DataFrame:
     return await _run_sync(_download_tickers, symbols, period, interval)
+
+
+async def get_multi_ticker_info(symbols: list[str]) -> list[dict]:
+    return await _run_sync(_get_multi_ticker_info, symbols)

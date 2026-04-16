@@ -12,6 +12,8 @@ from app.cache.cache_keys import (
     stock_fundamentals_key, STOCK_FUNDAMENTALS_TTL,
     stock_ratios_key, STOCK_RATIOS_TTL,
     stock_dividends_key, STOCK_DIVIDENDS_TTL,
+    short_interest_key, SHORT_INTEREST_TTL,
+    stock_comparison_key, STOCK_COMPARISON_TTL,
 )
 from app.utils.helpers import safe_float, safe_int, df_to_records
 
@@ -22,7 +24,7 @@ async def _fetch_quote(symbol: str) -> dict:
     try:
         loop = asyncio.get_event_loop()
         fh_quote = await loop.run_in_executor(_executor, partial(fh.stock_quote, symbol))
-        return {
+        result = {
             "symbol": symbol,
             "price": safe_float(fh_quote.get("c")),
             "change": safe_float(fh_quote.get("d")),
@@ -38,7 +40,7 @@ async def _fetch_quote(symbol: str) -> dict:
         info = await yf.get_ticker_fast_info(symbol)
         last = safe_float(info.get("lastPrice"), 0)
         prev = safe_float(info.get("previousClose"), 0)
-        return {
+        result = {
             "symbol": symbol,
             "price": last,
             "change": round(last - prev, 2) if last and prev else None,
@@ -49,6 +51,25 @@ async def _fetch_quote(symbol: str) -> dict:
             "previousClose": prev,
             "timestamp": None,
         }
+
+    # Supplement with extended hours data
+    try:
+        info = await yf.get_ticker_info(symbol)
+        result["preMarketPrice"] = safe_float(info.get("preMarketPrice"))
+        result["preMarketChange"] = safe_float(info.get("preMarketChange"))
+        result["preMarketChangePercent"] = safe_float(info.get("preMarketChangePercent"))
+        result["postMarketPrice"] = safe_float(info.get("postMarketPrice"))
+        result["postMarketChange"] = safe_float(info.get("postMarketChange"))
+        result["postMarketChangePercent"] = safe_float(info.get("postMarketChangePercent"))
+    except Exception:
+        result["preMarketPrice"] = None
+        result["preMarketChange"] = None
+        result["preMarketChangePercent"] = None
+        result["postMarketPrice"] = None
+        result["postMarketChange"] = None
+        result["postMarketChangePercent"] = None
+
+    return result
 
 
 async def get_quote(symbol: str) -> dict:
@@ -200,4 +221,53 @@ async def get_dividends(symbol: str) -> dict:
     return await get_or_fetch(
         stock_dividends_key(symbol), STOCK_DIVIDENDS_TTL,
         lambda: _fetch_dividends(symbol)
+    )
+
+
+async def _fetch_short_interest(symbol: str) -> dict:
+    info = await yf.get_ticker_info(symbol)
+    return {
+        "symbol": symbol,
+        "shortPercentOfFloat": safe_float(info.get("shortPercentOfFloat")),
+        "shortRatio": safe_float(info.get("shortRatio")),
+        "sharesShort": safe_int(info.get("sharesShort")),
+        "sharesShortPriorMonth": safe_int(info.get("sharesShortPriorMonth")),
+        "dateShortInterest": info.get("dateShortInterest"),
+    }
+
+
+async def get_short_interest(symbol: str) -> dict:
+    return await get_or_fetch(
+        short_interest_key(symbol), SHORT_INTEREST_TTL,
+        lambda: _fetch_short_interest(symbol)
+    )
+
+
+async def _fetch_comparison(symbols: list[str], period: str, interval: str) -> dict:
+    tasks = [yf.get_ticker_history(s, period=period, interval=interval) for s in symbols]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    series = {}
+    for symbol, result in zip(symbols, results):
+        if isinstance(result, Exception) or result is None or result.empty:
+            continue
+        closes = result["Close"]
+        base = float(closes.iloc[0])
+        if base == 0:
+            continue
+        points = []
+        for idx, val in closes.items():
+            time_str = idx.strftime("%Y-%m-%d") if interval in ("1d", "1wk", "1mo") else idx.isoformat()
+            pct = (float(val) - base) / base * 100
+            points.append({"time": time_str, "value": round(pct, 2)})
+        series[symbol] = points
+
+    return {"symbols": list(series.keys()), "series": series}
+
+
+async def get_comparison(symbols: list[str], period: str = "1y", interval: str = "1d") -> dict:
+    symbols_hash = ",".join(sorted(symbols))
+    return await get_or_fetch(
+        stock_comparison_key(symbols_hash, period), STOCK_COMPARISON_TTL,
+        lambda: _fetch_comparison(symbols, period, interval)
     )

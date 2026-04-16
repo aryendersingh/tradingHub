@@ -9,6 +9,7 @@ from app.cache.cache_keys import (
     analyst_ratings_key, ANALYST_RATINGS_TTL,
     analyst_targets_key, ANALYST_TARGETS_TTL,
     earnings_key, EARNINGS_TTL,
+    earnings_calendar_key, EARNINGS_CALENDAR_TTL,
 )
 from app.utils.helpers import safe_float, safe_int, df_to_records
 
@@ -106,4 +107,34 @@ async def get_earnings(symbol: str) -> list[dict]:
     return await get_or_fetch(
         earnings_key(symbol), EARNINGS_TTL,
         lambda: _fetch_earnings(symbol)
+    )
+
+
+async def _fetch_earnings_calendar(from_date: str, to_date: str) -> list[dict]:
+    loop = asyncio.get_event_loop()
+    try:
+        cal = await loop.run_in_executor(
+            _executor, partial(fh.earnings_calendar, from_date, to_date)
+        )
+        events = cal.get("earningsCalendar", [])
+        return [
+            {
+                "date": e.get("date", ""),
+                "symbol": e.get("symbol", ""),
+                "hour": e.get("hour", ""),
+                "epsEstimate": safe_float(e.get("epsEstimate")),
+                "epsActual": safe_float(e.get("epsActual")),
+                "revenueEstimate": safe_float(e.get("revenueEstimate")),
+                "revenueActual": safe_float(e.get("revenueActual")),
+            }
+            for e in events[:100]
+        ]
+    except Exception:
+        return []
+
+
+async def get_earnings_calendar(from_date: str, to_date: str) -> list[dict]:
+    return await get_or_fetch(
+        earnings_calendar_key(from_date, to_date), EARNINGS_CALENDAR_TTL,
+        lambda: _fetch_earnings_calendar(from_date, to_date)
     )

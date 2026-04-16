@@ -14,6 +14,8 @@ import {
   getFilings,
   getInstitutional,
   getInsiders,
+  getPeers,
+  getShortInterest,
 } from "@/lib/api";
 import { REFRESH_INTERVALS } from "@/lib/constants";
 
@@ -129,6 +131,24 @@ export function useInsiders(symbol: string) {
   return useQuery({
     queryKey: ["stock", symbol, "insiders"],
     queryFn: () => getInsiders(symbol),
+    staleTime: REFRESH_INTERVALS.fundamentals,
+    enabled: !!symbol,
+  });
+}
+
+export function usePeers(symbol: string) {
+  return useQuery({
+    queryKey: ["stock", symbol, "peers"],
+    queryFn: () => getPeers(symbol),
+    staleTime: REFRESH_INTERVALS.fundamentals,
+    enabled: !!symbol,
+  });
+}
+
+export function useShortInterest(symbol: string) {
+  return useQuery({
+    queryKey: ["stock", symbol, "short-interest"],
+    queryFn: () => getShortInterest(symbol),
     staleTime: REFRESH_INTERVALS.fundamentals,
     enabled: !!symbol,
   });

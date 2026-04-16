@@ -29,6 +29,12 @@ export interface StockQuote {
   open: number | null;
   previousClose: number | null;
   timestamp: number | null;
+  preMarketPrice: number | null;
+  preMarketChange: number | null;
+  preMarketChangePercent: number | null;
+  postMarketPrice: number | null;
+  postMarketChange: number | null;
+  postMarketChangePercent: number | null;
 }
 
 export interface StockProfile {
@@ -188,4 +194,108 @@ export interface InsiderTransaction {
   transaction: string;
   shares: number | null;
   value: number | null;
+}
+
+export interface PeerData {
+  symbol: string;
+  name: string;
+  marketCap: number | null;
+  trailingPE: number | null;
+  priceToBook: number | null;
+  grossMargins: number | null;
+  operatingMargins: number | null;
+  profitMargins: number | null;
+  changePercent: number | null;
+}
+
+export interface PeerComparison {
+  symbol: string;
+  sector: string;
+  peers: PeerData[];
+}
+
+export interface EarningsCalendarEntry {
+  date: string;
+  symbol: string;
+  hour: string;
+  epsEstimate: number | null;
+  epsActual: number | null;
+  revenueEstimate: number | null;
+  revenueActual: number | null;
+}
+
+export interface MarketBreadth {
+  advancing: number;
+  declining: number;
+  advanceDeclineRatio: number;
+  above200SMA: number;
+  below200SMA: number;
+  pctAbove200SMA: number;
+  newHighs: number;
+  newLows: number;
+}
+
+export interface PutCallRatio {
+  ratio: number | null;
+  signal: string;
+}
+
+export interface ShortInterest {
+  symbol: string;
+  shortPercentOfFloat: number | null;
+  shortRatio: number | null;
+  sharesShort: number | null;
+  sharesShortPriorMonth: number | null;
+  dateShortInterest: number | null;
+}
+
+export interface CommodityData {
+  name: string;
+  symbol: string;
+  price: number;
+  change: number;
+  changePercent: number;
+}
+
+export interface GlobalIndex {
+  name: string;
+  symbol: string;
+  price: number;
+  change: number;
+  changePercent: number;
+}
+
+export interface FearGreedComponent {
+  value: number;
+  score: number;
+}
+
+export interface FearGreedData {
+  score: number;
+  label: string;
+  components: Record<string, FearGreedComponent>;
+}
+
+export interface IPOEntry {
+  date: string;
+  exchange: string;
+  name: string;
+  symbol: string;
+  price: string;
+  shares: number | null;
+  totalSharesValue: number | null;
+  status: string;
+}
+
+export interface PortfolioPosition {
+  symbol: string;
+  name?: string;
+  shares: number;
+  costBasis: number;
+  addedAt: string;
+}
+
+export interface ComparisonSeries {
+  symbols: string[];
+  series: Record<string, { time: string; value: number }[]>;
 }

@@ -53,6 +53,27 @@ export default function QuoteHeader({ symbol }: { symbol: string }) {
           </span>
         </div>
 
+        {(quote.preMarketPrice || quote.postMarketPrice) && (
+          <div className="flex items-center gap-3 text-xs font-mono">
+            {quote.preMarketPrice && (
+              <span className="text-[var(--text-muted)]">
+                Pre:{" "}
+                <span className={changeColor(quote.preMarketChange)}>
+                  {formatPrice(quote.preMarketPrice)} ({formatPercent(quote.preMarketChangePercent)})
+                </span>
+              </span>
+            )}
+            {quote.postMarketPrice && (
+              <span className="text-[var(--text-muted)]">
+                Post:{" "}
+                <span className={changeColor(quote.postMarketChange)}>
+                  {formatPrice(quote.postMarketPrice)} ({formatPercent(quote.postMarketChangePercent)})
+                </span>
+              </span>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-6 text-xs font-mono">
           <div>
             <span className="text-[var(--text-muted)]">Open </span>

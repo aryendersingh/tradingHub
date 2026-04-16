@@ -25,6 +25,15 @@ ECONOMIC_YIELDS_TTL = 3600  # 1h
 ECONOMIC_CALENDAR_TTL = 21600  # 6h
 ECONOMIC_SERIES_TTL = 3600  # 1h
 ECONOMIC_FOREX_TTL = 300  # 5min
+ECONOMIC_COMMODITIES_TTL = 300  # 5min
+EARNINGS_CALENDAR_TTL = 3600  # 1h
+PUTCALL_RATIO_TTL = 300  # 5min
+SHORT_INTEREST_TTL = 3600  # 1h
+GLOBAL_INDICES_TTL = 60  # 1min
+FEAR_GREED_TTL = 300  # 5min
+IPO_CALENDAR_TTL = 21600  # 6h
+PEER_COMPARISON_TTL = 3600  # 1h
+STOCK_COMPARISON_TTL = 3600  # 1h
 
 
 def market_overview_key() -> str:
@@ -125,3 +134,39 @@ def economic_series_key(series_id: str) -> str:
 
 def economic_forex_key() -> str:
     return "economic:forex"
+
+
+def economic_commodities_key() -> str:
+    return "economic:commodities"
+
+
+def earnings_calendar_key(from_date: str, to_date: str) -> str:
+    return f"earnings:calendar:{from_date}:{to_date}"
+
+
+def putcall_ratio_key() -> str:
+    return "market:putcall"
+
+
+def short_interest_key(symbol: str) -> str:
+    return f"stock:{symbol}:short_interest"
+
+
+def global_indices_key() -> str:
+    return "market:global_indices"
+
+
+def fear_greed_key() -> str:
+    return "market:fear_greed"
+
+
+def ipo_calendar_key(from_date: str, to_date: str) -> str:
+    return f"market:ipo:{from_date}:{to_date}"
+
+
+def peer_comparison_key(symbol: str) -> str:
+    return f"stock:{symbol}:peers"
+
+
+def stock_comparison_key(symbols_hash: str, period: str) -> str:
+    return f"compare:{symbols_hash}:{period}"

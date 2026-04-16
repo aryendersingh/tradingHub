@@ -9,6 +9,8 @@ import {
   Globe,
   List,
   Filter,
+  Briefcase,
+  ArrowLeftRight,
 } from "lucide-react";
 
 export default function Navbar() {
@@ -78,6 +80,20 @@ export default function Navbar() {
         >
           <List size={13} />
           Watchlist
+        </Link>
+        <Link
+          href="/portfolio"
+          className="flex items-center gap-1 hover:text-[var(--text-primary)] transition-colors"
+        >
+          <Briefcase size={13} />
+          Portfolio
+        </Link>
+        <Link
+          href="/compare"
+          className="flex items-center gap-1 hover:text-[var(--text-primary)] transition-colors"
+        >
+          <ArrowLeftRight size={13} />
+          Compare
         </Link>
       </div>
 

@@ -80,4 +80,39 @@ export const getForex = () => api.get("/economic/forex").then((r) => r.data);
 export const scanStocks = (filters: Record<string, unknown>) =>
   api.post("/screener/scan", filters).then((r) => r.data);
 
+// Peers
+export const getPeers = (symbol: string) =>
+  api.get(`/stock/${symbol}/peers`).then((r) => r.data);
+
+// Short Interest
+export const getShortInterest = (symbol: string) =>
+  api.get(`/stock/${symbol}/short-interest`).then((r) => r.data);
+
+// Market Breadth
+export const getMarketBreadth = () => api.get("/market/breadth").then((r) => r.data);
+
+// Put/Call Ratio
+export const getPutCallRatio = () => api.get("/market/putcall").then((r) => r.data);
+
+// Global Indices
+export const getGlobalIndices = () => api.get("/market/global").then((r) => r.data);
+
+// Fear & Greed
+export const getFearGreed = () => api.get("/market/fear-greed").then((r) => r.data);
+
+// Earnings Calendar
+export const getEarningsCalendar = (fromDate?: string, toDate?: string) =>
+  api.get("/stock/earnings-calendar", { params: { from_date: fromDate, to_date: toDate } }).then((r) => r.data);
+
+// IPO Calendar
+export const getIPOCalendar = (fromDate?: string, toDate?: string) =>
+  api.get("/economic/ipo-calendar", { params: { from_date: fromDate, to_date: toDate } }).then((r) => r.data);
+
+// Commodities
+export const getCommodities = () => api.get("/economic/commodities").then((r) => r.data);
+
+// Stock Comparison
+export const getStockComparison = (symbols: string[], period = "1y", interval = "1d") =>
+  api.get(`/stock/compare?symbols=${symbols.join(",")}&period=${period}&interval=${interval}`).then((r) => r.data);
+
 export default api;

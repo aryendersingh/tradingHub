@@ -1,7 +1,7 @@
 "use client";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { WatchlistItem } from "@/lib/types";
+import type { WatchlistItem, PortfolioPosition } from "@/lib/types";
 
 interface LiveQuote {
   price: number;
@@ -18,6 +18,12 @@ interface AppState {
   watchlist: WatchlistItem[];
   addToWatchlist: (item: WatchlistItem) => void;
   removeFromWatchlist: (symbol: string) => void;
+
+  // Portfolio
+  portfolio: PortfolioPosition[];
+  addPosition: (pos: PortfolioPosition) => void;
+  removePosition: (symbol: string) => void;
+  updatePosition: (symbol: string, updates: Partial<PortfolioPosition>) => void;
 
   // Active symbol for global context
   activeSymbol: string | null;
@@ -56,12 +62,26 @@ export const useStore = create<AppState>()(
           watchlist: state.watchlist.filter((w) => w.symbol !== symbol),
         })),
 
+      portfolio: [],
+      addPosition: (pos) =>
+        set((state) => ({ portfolio: [...state.portfolio, pos] })),
+      removePosition: (symbol) =>
+        set((state) => ({
+          portfolio: state.portfolio.filter((p) => p.symbol !== symbol),
+        })),
+      updatePosition: (symbol, updates) =>
+        set((state) => ({
+          portfolio: state.portfolio.map((p) =>
+            p.symbol === symbol ? { ...p, ...updates } : p
+          ),
+        })),
+
       activeSymbol: null,
       setActiveSymbol: (symbol) => set({ activeSymbol: symbol }),
     }),
     {
       name: "tradinghub-store",
-      partialize: (state) => ({ watchlist: state.watchlist }),
+      partialize: (state) => ({ watchlist: state.watchlist, portfolio: state.portfolio }),
     }
   )
 );

@@ -57,3 +57,7 @@ def stock_insider_transactions(symbol: str) -> dict:
 
 def economic_calendar() -> dict:
     return get_finnhub().economic_calendar()
+
+
+def ipo_calendar(from_date: str, to_date: str) -> dict:
+    return get_finnhub().ipo_calendar(_from=from_date, to=to_date)

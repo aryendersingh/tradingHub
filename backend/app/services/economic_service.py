@@ -11,6 +11,7 @@ from app.cache.cache_keys import (
     economic_calendar_key, ECONOMIC_CALENDAR_TTL,
     economic_series_key, ECONOMIC_SERIES_TTL,
     economic_forex_key, ECONOMIC_FOREX_TTL,
+    economic_commodities_key, ECONOMIC_COMMODITIES_TTL,
 )
 from app.utils.helpers import safe_float
 
@@ -26,6 +27,14 @@ MACRO_SERIES = {
     "Fed Funds Rate": "DFF",
     "10Y-2Y Spread": "T10Y2Y",
     "PCE": "PCEPI",
+}
+
+COMMODITY_SYMBOLS = {
+    "Gold": "GC=F",
+    "Silver": "SI=F",
+    "Crude Oil": "CL=F",
+    "Natural Gas": "NG=F",
+    "Copper": "HG=F",
 }
 
 FOREX_PAIRS = {
@@ -132,3 +141,35 @@ async def get_macro_indicators() -> dict:
         if val is not None:
             indicators[name] = round(val, 2)
     return indicators
+
+
+async def _fetch_commodities() -> list[dict]:
+    commodities = []
+    tasks = []
+    names = list(COMMODITY_SYMBOLS.keys())
+
+    for name, symbol in COMMODITY_SYMBOLS.items():
+        tasks.append(yf.get_ticker_fast_info(symbol))
+
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    for name, result in zip(names, results):
+        if isinstance(result, Exception):
+            continue
+        last = safe_float(result.get("lastPrice"), 0)
+        prev = safe_float(result.get("previousClose"), 0)
+        change = last - prev
+        change_pct = (change / prev * 100) if prev else 0
+        commodities.append({
+            "name": name,
+            "symbol": COMMODITY_SYMBOLS[name],
+            "price": round(last, 2),
+            "change": round(change, 2),
+            "changePercent": round(change_pct, 2),
+        })
+
+    return commodities
+
+
+async def get_commodities() -> list[dict]:
+    return await get_or_fetch(economic_commodities_key(), ECONOMIC_COMMODITIES_TTL, _fetch_commodities)
